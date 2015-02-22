@@ -3,6 +3,9 @@ namespace minphp\Input;
 
 use \PHPUnit_Framework_TestCase;
 
+/**
+ * @coversDefaultClass \minphp\Input\Input
+ */
 class InputTest extends PHPUnit_Framework_TestCase
 {
 
@@ -14,7 +17,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::isEmail
+     * @covers ::isEmail
      */
     public function testIsEmail()
     {
@@ -26,7 +29,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::isEmpty
+     * @covers ::isEmpty
      */
     public function testIsEmpty()
     {
@@ -37,7 +40,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::isPassword
+     * @covers ::isPassword
      * @dataProvider isPasswordProvider
      */
     public function testIsPassword($str, $length, $type, $regex, $result)
@@ -75,7 +78,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::isDate()
+     * @covers ::isDate()
      * @dataProvider isDateProvider
      */
     public function testIsDate($date, $min, $max, $result)
@@ -102,7 +105,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::matches
+     * @covers ::matches
      */
     public function testMatches()
     {
@@ -111,7 +114,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::compares
+     * @covers ::compares
      * @dataProvider comparesProvider
      */
     public function testCompares($a, $op, $b, $result)
@@ -161,7 +164,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::between
+     * @covers ::between
      */
     public function testBetween()
     {
@@ -170,7 +173,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::minLength
+     * @covers ::minLength
      */
     public function testMinLength()
     {
@@ -179,7 +182,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::maxLength
+     * @covers ::maxLength
      */
     public function testMaxLength()
     {
@@ -188,7 +191,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::betweenLength
+     * @covers ::betweenLength
      */
     public function testBetweenLength()
     {
@@ -198,8 +201,8 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::setErrors
-     * @covers Input::errors
+     * @covers ::setErrors
+     * @covers ::errors
      */
     public function testSetErrors()
     {
@@ -213,15 +216,15 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::setRules
-     * @covers Input::validates
-     * @covers Input::pathSet
-     * @covers Input::clearLeaves
-     * @covers Input::arrayWalkRecursive
-     * @covers Input::validateRule
-     * @covers Input::formatData
-     * @covers Input::replaceLinkedParams
-     * @covers Input::processValidation
+     * @covers ::setRules
+     * @covers ::validates
+     * @covers ::pathSet
+     * @covers ::clearLeaves
+     * @covers ::arrayWalkRecursive
+     * @covers ::validateRule
+     * @covers ::formatData
+     * @covers ::replaceLinkedParams
+     * @covers ::processValidation
      * @dataProvider inputPreFormatProvider
      */
     public function testPreFormat($rules, $data, $formatted_data)
@@ -237,15 +240,15 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Input::setRules
-     * @covers Input::validates
-     * @covers Input::pathSet
-     * @covers Input::clearLeaves
-     * @covers Input::arrayWalkRecursive
-     * @covers Input::validateRule
-     * @covers Input::formatData
-     * @covers Input::replaceLinkedParams
-     * @covers Input::processValidation
+     * @covers ::setRules
+     * @covers ::validates
+     * @covers ::pathSet
+     * @covers ::clearLeaves
+     * @covers ::arrayWalkRecursive
+     * @covers ::validateRule
+     * @covers ::formatData
+     * @covers ::replaceLinkedParams
+     * @covers ::processValidation
      * @dataProvider inputPostFormatProvider
      */
     public function testPostFormat($rules, $data, $formatted_data)
@@ -261,15 +264,15 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::setRules
-     * @covers Input::validates
-     * @covers Input::pathSet
-     * @covers Input::clearLeaves
-     * @covers Input::arrayWalkRecursive
-     * @covers Input::validateRule
-     * @covers Input::formatData
-     * @covers Input::replaceLinkedParams
-     * @covers Input::processValidation
+     * @covers ::setRules
+     * @covers ::validates
+     * @covers ::pathSet
+     * @covers ::clearLeaves
+     * @covers ::arrayWalkRecursive
+     * @covers ::validateRule
+     * @covers ::formatData
+     * @covers ::replaceLinkedParams
+     * @covers ::processValidation
      * @dataProvider inputValidationProvider
      */
     public function testValidation($rules, $data, $result)
@@ -283,9 +286,9 @@ class InputTest extends PHPUnit_Framework_TestCase
     }
     
     /**
-     * @covers Input::setRules
-     * @covers Input::validates
-     * @covers Input::replaceLinkedParams
+     * @covers ::setRules
+     * @covers ::validates
+     * @covers ::replaceLinkedParams
      */
     public function testValidationLinkedParams()
     {
