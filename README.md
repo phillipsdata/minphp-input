@@ -9,7 +9,7 @@ Input Validation Library.
 Install via composer:
 
 ```sh
-composer install minphp/input:dev-master
+composer require minphp/input:dev-master
 ```
 
 ## Basic Usage
