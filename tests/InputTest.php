@@ -296,7 +296,7 @@ class InputTest extends PHPUnit_Framework_TestCase
             'items[][name]' => array(
                 'valid' => array(
                     'rule' => array(
-                        function($name, $price) {
+                        function ($name, $price) {
                             return $name !== null && is_numeric($price);
                         },
                         array('_linked' => "items[][price]")
