@@ -10,12 +10,12 @@ class InputTest extends PHPUnit_Framework_TestCase
 {
 
     private $Input;
-    
+
     public function setUp()
     {
         $this->Input = new Input();
     }
-    
+
     /**
      * @covers ::isEmail
      */
@@ -26,8 +26,9 @@ class InputTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->Input->isEmail("a@b", false));
         $this->assertTrue($this->Input->isEmail("someone@google.com"));
         $this->assertFalse($this->Input->isEmail("someone@mnbvcxzljhgfdsapoiuytrewq.tld", true));
+        $this->assertTrue($this->Input->isEmail("someone@a.accountants", false));
     }
-    
+
     /**
      * @covers ::isEmpty
      */
@@ -38,7 +39,7 @@ class InputTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->Input->isEmpty("hello world"));
         $this->assertFalse($this->Input->isEmpty(0));
     }
-    
+
     /**
      * @covers ::isPassword
      * @dataProvider isPasswordProvider
@@ -47,7 +48,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals($result, $this->Input->isPassword($str, $length, $type, $regex));
     }
-    
+
     /**
      * Data provider for testIsPassword
      */
@@ -76,7 +77,7 @@ class InputTest extends PHPUnit_Framework_TestCase
             array("1234-567", 0, "custom", "/[0-9]{3}-[0-9]{4}/i", false)
         );
     }
-    
+
     /**
      * @covers ::isDate()
      * @dataProvider isDateProvider
@@ -85,7 +86,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals($result, $this->Input->isDate($date, $min, $max));
     }
-    
+
     /**
      * Data provider for testIsDate
      */
@@ -103,7 +104,7 @@ class InputTest extends PHPUnit_Framework_TestCase
             array("2111-01-31T00:00:00Z", null, "2011-02-01T00:00:00-00:00", false)
         );
     }
-    
+
     /**
      * @covers ::matches
      */
@@ -112,7 +113,7 @@ class InputTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->Input->matches("abc", "/^[a][b][c]$/"));
         $this->assertFalse($this->Input->matches("ABC", "/^[a][b][c]$/"));
     }
-    
+
     /**
      * @covers ::compares
      * @dataProvider comparesProvider
@@ -121,7 +122,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals($result, $this->Input->compares($a, $op, $b));
     }
-    
+
     /**
      * @expectedException Exception
      */
@@ -129,7 +130,7 @@ class InputTest extends PHPUnit_Framework_TestCase
     {
         $this->Input->compares(1, "&", 0);
     }
-    
+
     /**
      * Data provider for testCompares
      */
@@ -162,7 +163,7 @@ class InputTest extends PHPUnit_Framework_TestCase
             array(1, "!==", 1, false)
         );
     }
-    
+
     /**
      * @covers ::between
      */
@@ -171,7 +172,7 @@ class InputTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->Input->between(3, 1, 3, true));
         $this->assertFalse($this->Input->between(3, 1, 3, false));
     }
-    
+
     /**
      * @covers ::minLength
      */
@@ -180,7 +181,7 @@ class InputTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->Input->minLength("hello", 5));
         $this->assertFalse($this->Input->minLength("hello world", 12));
     }
-    
+
     /**
      * @covers ::maxLength
      */
@@ -189,7 +190,7 @@ class InputTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->Input->maxLength("hello", 5));
         $this->assertFalse($this->Input->maxLength("hello world", 5));
     }
-    
+
     /**
      * @covers ::betweenLength
      */
@@ -199,7 +200,7 @@ class InputTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($this->Input->betweenLength("hello world", 5, 11));
         $this->assertFalse($this->Input->betweenLength("hello world!", 5, 11));
     }
-    
+
     /**
      * @covers ::setErrors
      * @covers ::errors
@@ -214,7 +215,7 @@ class InputTest extends PHPUnit_Framework_TestCase
         $this->Input->setErrors($errors);
         $this->assertEquals($errors, $this->Input->errors());
     }
-    
+
     /**
      * @covers ::setRules
      * @covers ::validates
@@ -231,10 +232,10 @@ class InputTest extends PHPUnit_Framework_TestCase
     {
         // Set the rules to test
         $this->Input->setRules($rules);
-        
+
         // Attempt to validate $data against $rules
         $this->Input->validates($data);
-        
+
         // Ensure that data is now modified such that is matches our expected $formatted_data
         $this->assertEquals($formatted_data, $data);
     }
@@ -255,14 +256,14 @@ class InputTest extends PHPUnit_Framework_TestCase
     {
         // Set the rules to test
         $this->Input->setRules($rules);
-        
+
         // Attempt to validate $data against $rules
         $this->Input->validates($data);
-        
+
         // Ensure that data is now modified such that is matches our expected $formatted_data
         $this->assertEquals($formatted_data, $data);
     }
-    
+
     /**
      * @covers ::setRules
      * @covers ::validates
@@ -279,12 +280,12 @@ class InputTest extends PHPUnit_Framework_TestCase
     {
         // Set the rules to test
         $this->Input->setRules($rules);
-        
+
         // Attempt to validate $data against $rules
         $this->assertEquals($result, $this->Input->validates($data));
 
     }
-    
+
     /**
      * @covers ::setRules
      * @covers ::validates
@@ -310,10 +311,10 @@ class InputTest extends PHPUnit_Framework_TestCase
                 array('name' => "Item 2", 'price' => 2.75),
             )
         );
-        
+
         $this->Input->setRules($rules);
         $this->assertTrue($this->Input->validates($data));
-        
+
         unset($data['items'][1]['price']);
         $this->assertFalse($this->Input->validates($data));
     }
@@ -327,10 +328,10 @@ class InputTest extends PHPUnit_Framework_TestCase
     {
         return $this->getInputDataFormatting("post_format");
     }
-    
+
     protected function getInputDataFormatting($action)
     {
-        
+
         $rule_sets = array(
             array(
                 'name' => array(
@@ -365,7 +366,7 @@ class InputTest extends PHPUnit_Framework_TestCase
                 )
             )
         );
-        
+
         $data_sets = array(
             array(
                 'name' => "Person Name",
@@ -382,9 +383,9 @@ class InputTest extends PHPUnit_Framework_TestCase
                 )
             )
         );
-        
+
         $formatted_data = $data_sets;
-        
+
         $formatted_data[0]['name'] = strtolower($formatted_data[0]['name']);
         $formatted_data[0]['company'] = strtoupper($formatted_data[0]['company']);
         foreach ($formatted_data[1]['name'] as &$result) {
@@ -393,18 +394,18 @@ class InputTest extends PHPUnit_Framework_TestCase
         foreach ($formatted_data[1]['company'] as &$result) {
             $result = strtoupper($result);
         }
-        
+
         $data = array();
         foreach ($rule_sets as $i => $value) {
             $data[] = array($rule_sets[$i], $data_sets[$i], $formatted_data[$i]);
         }
-        
+
         return $data;
     }
-    
+
     public function inputValidationProvider()
     {
-        
+
         $rule_sets = array(
             // scalar
             array(
@@ -438,7 +439,7 @@ class InputTest extends PHPUnit_Framework_TestCase
                     )
                 ),
                 'nonexistent[]'  =>  array(
-                    
+
                 )
             ),
             // multi-dimensional array
@@ -512,7 +513,7 @@ class InputTest extends PHPUnit_Framework_TestCase
                 )
             )
         );
-        
+
         $data_sets = array(
             array(
                 'name' => "Firstname Lastname",
@@ -578,16 +579,16 @@ class InputTest extends PHPUnit_Framework_TestCase
             true,
             false
         );
-        
+
         $data = array();
         foreach ($rule_sets as $i => $set) {
             $data[] = array($rule_sets[$i], $data_sets[$i], $result_sets[$i]);
         }
-        
+
         return $data;
-        
+
     }
-    
+
     public function callBackTestMethod($value)
     {
         return true;

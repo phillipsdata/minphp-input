@@ -26,7 +26,7 @@ class Input
      * @var mixed A set of data that this instance is currently validating
      */
     private $data = null;
-    
+
     /**
      * Checks if the given string is a valid email address
      *
@@ -36,9 +36,10 @@ class Input
      */
     public static function isEmail($str, $check_record = true)
     {
+        $check = array();
         // Verify that the address is formatted correctly
         if (isset($str) && preg_match(
-            "/^[a-z0-9!#$%\*\/?\|^\{\}`~&'\+=_.-]+@[a-z0-9.-]+\.[a-z0-9]{2,10}$/Di",
+            "/^[a-z0-9!#$%\*\/?\|^\{\}`~&'\+=_.-]+@[a-z0-9.-]+\.[a-z0-9]{1,63}$/Di",
             $str,
             $check
         )) {
@@ -46,7 +47,7 @@ class Input
             if ($check_record) {
                 // Append "." to the host name to prevent DNS server from creating the record
                 $host = substr(strstr($check[0], '@'), 1) . ".";
-                
+                $mxhosts = array();
                 if (function_exists("getmxrr") && !getmxrr($host, $mxhosts)) {
                     // This will catch DNSs that are not MX
                     if (function_exists("checkdnsrr") && !checkdnsrr($host, "ANY")) {
@@ -56,10 +57,10 @@ class Input
             }
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Checks if the given string is empty or otherwise not set
      *
@@ -73,7 +74,7 @@ class Input
         }
         return false;
     }
-    
+
     /**
      * Tests whether the given string meets the requirements to be considered a password
      *
@@ -87,7 +88,7 @@ class Input
     public static function isPassword($str, $min_length = 6, $type = "any", $custom_regex = null)
     {
         $regex = "";
-        
+
         switch ($type) {
             default:
             case "any":
@@ -111,13 +112,13 @@ class Input
         }
         return preg_match($regex, $str);
     }
-    
+
     /**
      * Tests whether the given string is considered a valid date suitable to strtotime()
      *
      * @param string $str The string to test
      * @param mixed $min The minimum acceptable date (string) or unix time stamp (int)
-     * @param mixed $min The maximum acceptable date (string) or unix time stamp (int)
+     * @param mixed $max The maximum acceptable date (string) or unix time stamp (int)
      * @return boolean True if $str is a valid date, false otherwise
      */
     public static function isDate($str, $min = null, $max = null)
@@ -128,12 +129,12 @@ class Input
             if (!is_numeric($str)) {
                 $time = strtotime($str);
             }
-            
+
             // Ensure valid time
             if ($time === false || $time == -1) {
                 return false;
             }
-            
+
             // Check range
             if ($min !== null && (!is_numeric($min) ? $min = strtotime($min) : true) && $time < $min) {
                 return false;
@@ -141,12 +142,12 @@ class Input
             if ($max !== null && (!is_numeric($max) ? $max = strtotime($max) : true) && $time > $max) {
                 return false;
             }
-            
+
             return true;
         }
         return false;
     }
-    
+
     /**
      * Tests wether the given string satisfies the given regular expression
      *
@@ -158,7 +159,7 @@ class Input
     {
         return (boolean)preg_match($regex, $str);
     }
-    
+
     /**
      * Tests how the given values compare
      *
@@ -191,7 +192,7 @@ class Input
                 throw new Exception("Unrecognized operator: " . $op);
         }
     }
-    
+
     /**
      * Tests that $val is between $min and $max
      *
@@ -208,7 +209,7 @@ class Input
         }
         return $val > $min && $val < $max;
     }
-    
+
     /**
      * Test whether $str is at least $length bytes
      *
@@ -220,7 +221,7 @@ class Input
     {
         return strlen($str) >= $length;
     }
-    
+
     /**
      * Test whether $str is no more than $length bytes
      *
@@ -232,7 +233,7 @@ class Input
     {
         return strlen($str) <= $length;
     }
-    
+
     /**
      * Test whether $str is between $min_length and $max_length
      *
@@ -245,7 +246,7 @@ class Input
     {
         return self::minLength($str, $min_length) && self::maxLength($str, $max_length);
     }
-    
+
     /**
      * Set rules, overriding any existing rules set and empting any existing errors
      *
@@ -258,7 +259,7 @@ class Input
         $this->rules = $rules;
         $this->errors = array();
     }
-    
+
     /**
      * Invokes Input::validateRule() to process the rule against the given value.
      * This method formatted for use by array_walk_recusrive to process elements
@@ -274,15 +275,15 @@ class Input
      */
     public function processValidation(&$value, $key, $var, $max_depth = null, $cur_depth = 0, $path = array())
     {
-        
+
         // Find the key at the current depth
         $index = array_key_exists($cur_depth, $var['raw_index']) ? $var['raw_index'][$cur_depth] : "";
-        
+
         if ($cur_depth >= $max_depth && ($key == $index || is_numeric($key))) {
             $this->validateRule($var['index'], $var['rule'], $value, $key, $path);
         }
     }
-    
+
     /**
      * Validates all set rules using the given data, sets any error messages to Input::$errors
      * Each ruleset attached to a field can have the following indexes:
@@ -305,18 +306,18 @@ class Input
     {
         $this->end_checks = false;
         $this->data = $data;
-        
+
         if (is_array($this->rules) && is_array($data)) {
             // Test each rule
             foreach ($this->rules as $index => $rule) {
                 // Validate array rules
                 if (strpos($index, "[") !== false) {
                     $depth = substr_count($index, "[");
-                    
+
                     $field = array();
                     // Turn rule index into array
                     parse_str($index, $field);
-                    
+
                     // Convert $index string into an array where each index
                     // represents a depth and each value represents the key
                     $raw_index = explode("[", $index);
@@ -324,13 +325,13 @@ class Input
                         $key = trim($key, "]");
                     }
                     $depth = count($raw_index)-1;
-                    
+
                     // Extract the primary index
                     $index = key($field);
-                    
+
                     // Ensure final element of $field is null
                     $this->clearLeaves($field);
-                    
+
                     $val_exists = true;
                     // If the value doesn't exist, create it temporarily so the rule can be evaluated
                     if (!$this->pathSet($data, $field)) {
@@ -338,7 +339,7 @@ class Input
                         $data = $field; // $field makes a perfect substitute, it's already null
                         $val_exists = false;
                     }
-    
+
                     // Search recursively through the array for the element to be evaluated and attempt to validate it
                     $this->arrayWalkRecursive(
                         $data[$index],
@@ -346,7 +347,7 @@ class Input
                         array('index' => $index, 'raw_index' => $raw_index, 'rule' => $rule),
                         $depth
                     );
-                    
+
                     // Destroy the temporary value created in order to validate rules
                     if (!$val_exists) {
                         $data = $orig_data;
@@ -357,7 +358,7 @@ class Input
                     if (!array_key_exists($index, $data)) {
                         $val_exists = false;
                     }
-                    
+
                     $this->validateRule($index, $rule, $data[$index], $index);
                     if (!$val_exists) {
                         unset($data[$index]);
@@ -368,15 +369,15 @@ class Input
                 }
             }
         }
-        
+
         $this->data = null;
-        
+
         if (empty($this->errors)) {
             return true; // no rule has been broken
         }
         return false; // rules have been broken
     }
-    
+
     /**
      * Sets the given errors into the object, overriding existing errors (if any)
      *
@@ -387,7 +388,7 @@ class Input
     {
         $this->errors = $errors;
     }
-    
+
     /**
      * Return all errors
      *
@@ -398,10 +399,10 @@ class Input
         if (empty($this->errors)) {
             return false;
         }
-        
+
         return $this->errors;
     }
-    
+
     /**
      * Format Data from Input::validates() with the given $callback
      *
@@ -415,22 +416,22 @@ class Input
     private function formatData($callback, $data, $key, $path)
     {
         $params = array();
-        
+
         if (is_array($callback)) {
             $method = array_shift($callback);
             $params = $callback;
         } else {
             $method = $callback;
         }
-        
+
         $this->replaceLinkedParams($params, $path);
-        
+
         // Push $data onto the list of parameters
         array_unshift($params, $data);
-        
+
         return call_user_func_array($method, $params);
     }
-    
+
     /**
      * Replaces all linked params in rules identified by an array with an index of '_linked'.
      *
@@ -446,41 +447,41 @@ class Input
                 $numeric_paths[] = $index;
             }
         }
-        
+
         foreach ($params as &$param) {
             // The number of blank array indexes from the _linked rule value
             $blank = 0;
             // If the parameter given is linked, find the value of the linked field
             if (is_array($param) && isset($param['_linked'])) {
                 $data_set = $this->data;
-                
+
                 $index = $param['_linked'];
                 // default param to null, just incase it doesn't exist
                 $param = null;
-                
+
                 // Construct an array of all index levels for the _linked field
                 $raw_index = explode("[", $index);
                 foreach ($raw_index as &$index) {
                     $index = trim($index, "]");
-                    
+
                     // If any index is empty, try to substitute it for the current
                     // rule's path
                     if ($index == "" && array_key_exists($blank, $numeric_paths)) {
                         $index = $numeric_paths[$blank++];
                     }
-    
+
                     if (!array_key_exists($index, $data_set)) {
                         break;
                     }
                     $data_set =& $data_set[$index];
                 }
-    
+
                 $param = $data_set;
                 unset($data_set);
             }
         }
     }
-    
+
     /**
      * Validate the rule against the given index and value, sets any errors into this object's $errors class variable
      *
@@ -496,32 +497,32 @@ class Input
         if (isset($rule['rule'])) {
             $rule = array($rule);
         }
-    
+
         // Loop through each rule set for this index
         foreach ($rule as $type => $rule_set) {
             // Ensure that we are allowed to validate this rule, even if the value is not set
             if (!isset($value) && isset($rule_set['if_set']) && $rule_set['if_set']) {
                 continue;
             }
-            
+
             if (is_array($rule_set['rule'])) {
                 $method = array_shift($rule_set['rule']);
             } else {
                 $method = $rule_set['rule'];
                 $rule_set['rule'] = array();
             }
-            
+
             // Format the data before running the evaluation
             if (isset($rule_set['pre_format'])) {
                 $value = $this->formatData($rule_set['pre_format'], $value, $key, $path);
             }
-            
+
             // Push the $data[$index] value onto the array of parameters to be
             // sent to the method governing the given rule
             array_unshift($rule_set['rule'], $value);
-            
+
             $this->replaceLinkedParams($rule_set['rule'], $path);
-            
+
             // Call the rule given, which may be a callback or a method within the scope of this class
             if (is_string($method)) {
                 // If the method doesn't exist in this class, assume it is a global PHP function
@@ -529,7 +530,7 @@ class Input
                     $method = array($this, $method);
                 }
             }
-            
+
             // Process boolean rules (true / false)
             if (is_bool($method)) {
                 $response = !$method;
@@ -537,7 +538,7 @@ class Input
                 // Process callback rules
                 $response = !call_user_func_array($method, $rule_set['rule']);
             }
-    
+
             // A response is considered an error if it returns false, so by default we negate
             // responses. If the rule set is configured to negate responses then we look for a 'true' response instead
             if ((isset($rule_set['negate']) && $rule_set['negate'] && !$response)
@@ -548,9 +549,9 @@ class Input
                 foreach ($path as $path_value) {
                     $error_key .= "[" . $path_value . "]";
                 }
-                
+
                 $this->errors[$error_key][$type] = (isset($rule_set['message']) ? $rule_set['message'] : null);
-                
+
                 // If this rule is set as the last to evaluate for this field stop checks
                 if (isset($rule_set['last']) && $rule_set['last']) {
                     break;
@@ -561,15 +562,15 @@ class Input
                     break;
                 }
             }
-            
+
             // Format the data after running the evaluation
             if (isset($rule_set['post_format'])) {
                 $value = $this->formatData($rule_set['post_format'], $value, $key, $path);
             }
-            
+
         }
     }
-    
+
     /**
      * Emulates the standard array_walk_recursive function, with the added functionality
      * of passing array elements through when no further recusion can be made
@@ -591,47 +592,47 @@ class Input
         $cur_depth = 0,
         $path = array()
     ) {
-        
+
         if (!is_array($input)) {
             return false;
         }
-        
+
         // Recursed as far down as permitted
         if ($max_depth > 0 && $cur_depth >= $max_depth) {
             return false;
         }
-        
+
         $cur_depth++;
-        
+
         foreach ($input as $key => $value) {
             $cur_key = array_key_exists($cur_depth, $params['raw_index']) ? $params['raw_index'][$cur_depth] : "";
-            
+
             // If the key doesn't match for this current depth, we're not supposed to evaluate it
             // so continue to the next element
             if ($key != $cur_key && $cur_key != "") {
                 continue;
             }
-            
+
             $path[] = $key;
-            
+
             // Invoke the callback, emulating the array_walk_recursive function
             if (!is_array($input[$key]) || $cur_depth >= $max_depth) {
                 call_user_func_array($callback, array(&$input[$key], $key, $params, $max_depth, $cur_depth, $path));
             }
-            
+
             if (is_array($input[$key])) {
                 // Recurse deeper
                 self::arrayWalkRecursive($input[$key], $callback, $params, $max_depth, $cur_depth, $path);
             }
-            
+
             // Make room for the next index at this level
             array_pop($path);
         }
-        
+
         // Finished all indexes at this depth, bubble back up
         return true;
     }
-    
+
     /**
      * Recursively evaluates whether the path defined by $field is defined in $data
      *
@@ -654,7 +655,7 @@ class Input
         }
         return true;
     }
-    
+
     /**
      * Recursively sets all leaf elements of the given array to null
      *
