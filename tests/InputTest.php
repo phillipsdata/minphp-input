@@ -1,10 +1,11 @@
 <?php
-namespace minphp\Input;
+namespace Minphp\Input\Tests;
 
-use \PHPUnit_Framework_TestCase;
+use PHPUnit_Framework_TestCase;
+use Minphp\Input\Input;
 
 /**
- * @coversDefaultClass \minphp\Input\Input
+ * @coversDefaultClass \Minphp\Input\Input
  */
 class InputTest extends PHPUnit_Framework_TestCase
 {

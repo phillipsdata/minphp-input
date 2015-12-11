@@ -1,7 +1,7 @@
 <?php
-namespace minphp\Input;
+namespace Minphp\Input;
 
-use \Exception;
+use Exception;
 
 /**
  * Supplies methods useful in verifying and formatting input data. Provides a
