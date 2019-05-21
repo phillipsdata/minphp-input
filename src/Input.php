@@ -470,7 +470,9 @@ class Input
                         $index = $numeric_paths[$blank++];
                     }
 
+                    // The _linked parameter is not available in the input data set
                     if (!array_key_exists($index, $data_set)) {
+                        $data_set = null;
                         break;
                     }
                     $data_set =& $data_set[$index];
@@ -567,7 +569,6 @@ class Input
             if (isset($rule_set['post_format'])) {
                 $value = $this->formatData($rule_set['post_format'], $value, $key, $path);
             }
-
         }
     }
 
