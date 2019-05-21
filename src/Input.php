@@ -569,7 +569,6 @@ class Input
             if (isset($rule_set['post_format'])) {
                 $value = $this->formatData($rule_set['post_format'], $value, $key, $path);
             }
-
         }
     }
 

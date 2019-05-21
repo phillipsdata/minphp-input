@@ -284,7 +284,6 @@ class InputTest extends PHPUnit_Framework_TestCase
 
         // Attempt to validate $data against $rules
         $this->assertEquals($result, $this->Input->validates($data));
-
     }
 
     /**
@@ -697,7 +696,6 @@ class InputTest extends PHPUnit_Framework_TestCase
         }
 
         return $data;
-
     }
 
     public function callBackTestMethod($value)
