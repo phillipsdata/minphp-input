@@ -320,6 +320,116 @@ class InputTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->Input->validates($data));
     }
 
+    /**
+     * @covers ::formatData
+     * @covers ::replaceLinkedParams
+     * @covers ::setRules
+     * @covers ::validateRule
+     * @dataProvider unsetLinkedParamsProvider
+     */
+    public function testUnsetLinkedParams(array $rules, array $input, $expected)
+    {
+        $this->Input->setRules($rules);
+        $this->assertEquals($expected, $this->Input->validates($input));
+    }
+
+    /**
+     * Data Provider for ::testUnsetLinkedParams
+     *
+     * @return array
+     */
+    public function unsetLinkedParamsProvider()
+    {
+        return array(
+            array(
+                array(
+                    'test' => array(
+                        'invalid' => array(
+                            'rule' => array(
+                                function ($test, $option) {
+                                    // $option should be null since it is not provided as input
+                                    return ($option === null);
+                                },
+                                // 'option' is not an input value
+                                array('_linked' => 'option')
+                            ),
+                            'message' => 'Test Error 1'
+                        )
+                    )
+                ),
+                array('test' => 'abc', 'x' => 100, 'y' => 200),
+                true
+            ),
+            array(
+                array(
+                    'test[][value]' => array(
+                        'invalid' => array(
+                            'rule' => array(
+                                function ($value, $option) {
+                                    // $option should be null since it is not provided as input
+                                    return ($option === null);
+                                },
+                                // 'option' is not an input value
+                                array('_linked' => 'test[][option]')
+                            ),
+                            'message' => 'Test Error 2'
+                        )
+                    )
+                ),
+                array('test' => array(array('value' => 1))),
+                true
+            ),
+            array(
+                array(
+                    'test[][value]' => array(
+                        'invalid' => array(
+                            'pre_format' => array(
+                                function ($value, $option) {
+                                    return ($option === null ? $value : $value * $option);
+                                },
+                                // 'option' is not an input value
+                                array('_linked' => 'test[][option]')
+                            ),
+                            'rule' => array(
+                                function ($value) {
+                                    // The value should not have changed during pre_format
+                                    return ($value === 1);
+                                },
+                            ),
+                            'message' => 'Test Error 3'
+                        )
+                    )
+                ),
+                array('test' => array(array('value' => 1))),
+                true
+            ),
+            array(
+                array(
+                    'test[][value]' => array(
+                        'invalid' => array(
+                            'pre_format' => array(
+                                function ($value, $option) {
+                                    return ($option === null ? $value : $value * $option);
+                                },
+                                // 'option' is an input value
+                                array('_linked' => 'test[][option]')
+                            ),
+                            'rule' => array(
+                                function ($value) {
+                                    // The value should have changed during pre_format
+                                    return ($value === 3);
+                                },
+                            ),
+                            'message' => 'Test Error 4'
+                        )
+                    )
+                ),
+                array('test' => array(array('value' => 1, 'option' => 3))),
+                true
+            )
+        );
+    }
+
     public function inputPreFormatProvider()
     {
         return $this->getInputDataFormatting("pre_format");
