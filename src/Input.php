@@ -472,8 +472,8 @@ class Input
 
                     // The _linked parameter is not available in the input data set
                     if (!array_key_exists($index, $data_set)) {
-                        $data_set = null;
-                        break;
+                        // Keep $param as null, but do not update the $data_set
+                        continue 2;
                     }
                     $data_set =& $data_set[$index];
                 }
