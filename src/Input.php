@@ -69,9 +69,14 @@ class Input
      */
     public static function isEmpty($str)
     {
+        if (!is_string($str)) {
+            return empty($str);
+        }
+
         if (!isset($str) || strlen($str) == 0) {
             return true;
         }
+
         return false;
     }
 
