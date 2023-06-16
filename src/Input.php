@@ -69,9 +69,14 @@ class Input
      */
     public static function isEmpty($str)
     {
+        if (!is_string($str)) {
+            return empty($str);
+        }
+
         if (!isset($str) || strlen($str) == 0) {
             return true;
         }
+
         return false;
     }
 
@@ -219,7 +224,7 @@ class Input
      */
     public static function minLength($str, $length)
     {
-        return strlen($str) >= $length;
+        return strlen(is_null($str) ? '' : $str) >= $length;
     }
 
     /**
@@ -231,7 +236,7 @@ class Input
      */
     public static function maxLength($str, $length)
     {
-        return strlen($str) <= $length;
+        return strlen(is_null($str) ? '' : $str) <= $length;
     }
 
     /**
